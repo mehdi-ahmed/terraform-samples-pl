@@ -26,3 +26,8 @@
 
 ### Mac OS ###
 .DS_Store.idea
+
+# 
+*.iml
+.idea
+.idea/*
