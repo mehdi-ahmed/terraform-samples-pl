@@ -13,7 +13,7 @@ provider "aws" {
 ##################################################################################
 
 data "aws_availability_zones" "available" {
-  name = "available"
+  state = "available"
 }
 
 ##################################################################################
@@ -36,18 +36,18 @@ resource "aws_internet_gateway" "app" {
 }
 
 resource "aws_subnet" "public_subnet1" {
-  cidr_block              = var.vpc_public_subnet1_cidr_block
+  cidr_block              = var.vpc_public_subnets_cidr_block[0]
   vpc_id                  = aws_vpc.app.id
-  availability_zone       = data.aws_availability_zones.available.name[0]
+  availability_zone       = data.aws_availability_zones.available.names[0]
   map_public_ip_on_launch = var.map_public_ip_on_launch
 
   tags = local.common_tags
 }
 
 resource "aws_subnet" "public_subnet2" {
-  cidr_block              = var.vpc_public_subnet1_cidr_block
+  cidr_block              = var.vpc_public_subnets_cidr_block[1]
   vpc_id                  = aws_vpc.app.id
-  availability_zone       = data.aws_availability_zones.available.name[1]
+  availability_zone       = data.aws_availability_zones.available.names[1]
   map_public_ip_on_launch = var.map_public_ip_on_launch
 
 
@@ -66,7 +66,7 @@ resource "aws_route_table" "app" {
   tags = local.common_tags
 }
 
-resource "aws_route_table_association" "app_subnet1" {
+resource "aws_route_table_association" "app_public_subnet1" {
   subnet_id      = aws_subnet.public_subnet1.id
   route_table_id = aws_route_table.app.id
 }
@@ -84,17 +84,41 @@ resource "aws_security_group" "nginx_sg" {
 
   # HTTP access from anywhere
   ingress {
-    from_port = 80
-    to_port   = 80
-    protocol  = "tcp"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr_block]
+  }
+
+  # outbound internet access
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = local.common_tags
+}
+
+# ALB Security Group
+resource "aws_security_group" "alb_sg" {
+  name   = "nginx_alb_sg"
+  vpc_id = aws_vpc.app.id
+
+  # HTTP access from anywhere
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   # outbound internet access
   egress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
