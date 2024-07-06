@@ -27,7 +27,7 @@
 ### Mac OS ###
 .DS_Store.idea
 
-# 
+#  InttelliJ
 *.iml
 .idea
 .idea/*
