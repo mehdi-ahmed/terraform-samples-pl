@@ -1,6 +1,8 @@
 - Chapter 1, 2, 3: Theory
 - chapter 4: Using Input Variables and Outputs
 - chapter 5: Updating project. Creating a new tf file for Load Balancer, EC2 instances. Renaming main.tf to network.tf
+  - (code Did not work - need further investigations)
+- Chapter 6: 
 
 
 

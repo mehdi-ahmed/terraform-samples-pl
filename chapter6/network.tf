@@ -1,14 +1,4 @@
 ##################################################################################
-# PROVIDERS
-##################################################################################
-
-provider "aws" {
-  access_key = var.aws_access_key
-  secret_key = var.aws_secret_key
-  region     = var.aws_region
-}
-
-##################################################################################
 # DATA
 ##################################################################################
 
@@ -32,14 +22,13 @@ resource "aws_internet_gateway" "app" {
   vpc_id = aws_vpc.app.id
 
   tags = local.common_tags
-
 }
 
 resource "aws_subnet" "public_subnet1" {
   cidr_block              = var.vpc_public_subnets_cidr_block[0]
   vpc_id                  = aws_vpc.app.id
-  availability_zone       = data.aws_availability_zones.available.names[0]
   map_public_ip_on_launch = var.map_public_ip_on_launch
+  availability_zone       = data.aws_availability_zones.available.names[0]
 
   tags = local.common_tags
 }
@@ -47,9 +36,8 @@ resource "aws_subnet" "public_subnet1" {
 resource "aws_subnet" "public_subnet2" {
   cidr_block              = var.vpc_public_subnets_cidr_block[1]
   vpc_id                  = aws_vpc.app.id
-  availability_zone       = data.aws_availability_zones.available.names[1]
   map_public_ip_on_launch = var.map_public_ip_on_launch
-
+  availability_zone       = data.aws_availability_zones.available.names[1]
 
   tags = local.common_tags
 }
@@ -66,12 +54,12 @@ resource "aws_route_table" "app" {
   tags = local.common_tags
 }
 
-resource "aws_route_table_association" "app_public_subnet1" {
+resource "aws_route_table_association" "app_subnet1" {
   subnet_id      = aws_subnet.public_subnet1.id
   route_table_id = aws_route_table.app.id
 }
 
-resource "aws_route_table_association" "app_public_subnet2" {
+resource "aws_route_table_association" "app_subnet2" {
   subnet_id      = aws_subnet.public_subnet2.id
   route_table_id = aws_route_table.app.id
 }
@@ -101,7 +89,6 @@ resource "aws_security_group" "nginx_sg" {
   tags = local.common_tags
 }
 
-# ALB Security Group
 resource "aws_security_group" "alb_sg" {
   name   = "nginx_alb_sg"
   vpc_id = aws_vpc.app.id
@@ -124,4 +111,3 @@ resource "aws_security_group" "alb_sg" {
 
   tags = local.common_tags
 }
-
